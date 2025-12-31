@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOSANDY PRINT MEDIA | Secure Enterprise System</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #0f172a; 
+            --primary-light: #1e293b;
+            --accent: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-input: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --nav-width: 260px;
+            --radius: 8px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #f8fafc;
+            --primary-light: #334155;
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; transition: background-color 0.2s, color 0.2s; }
+        
+        body { background-color: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .p-4 { padding: 1rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; font-weight: 700; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .text-muted { color: var(--text-muted); }
+        .w-full { width: 100%; }
+        
+        /* Components */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-secondary { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow-x: auto; /* Horizontal scroll for mobile tables */
+        }
+
+        .input-group { margin-bottom: 1rem; text-align: left; }
+        .input-group label { display: block; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            background: var(--bg-input);
+            color: var(--text-main);
+        }
+        .input-group input:focus, .input-group select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th { background: var(--bg-input); font-weight: 600; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+        tr:hover { background: rgba(0,0,0,0.02); }
+
+        /* Layout */
+        #auth-view {
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--bg-body) 0%, #e2e8f0 100%);
+        }
+        .auth-box { width: 100%; max-width: 420px; }
+        .auth-link { color: var(--accent); cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+        
+        #app-layout { display: flex; height: 100vh; }
+        aside {
+            width: var(--nav-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 1.5rem 1rem;
+            z-index: 50;
+        }
+        .nav-item {
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            border-radius: var(--radius);
+            margin-bottom: 0.4rem;
+            display: flex; align-items: center; gap: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(37, 99, 235, 0.1); color: var(--accent); }
+        
+        main { flex: 1; padding: 2rem; overflow-y: auto; position: relative; }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none; /* Hidden on desktop */
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--text-main);
+            cursor: pointer;
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 60;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .modal-content { background: var(--bg-card); padding: 2rem; border-radius: var(--radius); width: 90%; max-width: 500px; box-shadow: var(--shadow); max-height: 90vh; overflow-y: auto;}
+
+        /* Toast */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            padding: 1rem; background: var(--bg-card); border-left: 4px solid var(--accent);
+            border-radius: var(--radius); box-shadow: var(--shadow);
+            display: flex; align-items: center; gap: 10px; min-width: 280px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Print */
+        #print-area { display: none; }
+        @media print {
+            body > * { display: none !important; }
+            #print-area { display: block; font-family: 'Courier New', monospace; padding: 20px; }
+            .receipt-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
+            .receipt-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+            .receipt-total { border-top: 2px dashed #000; padding-top: 10px; font-weight: bold; display: flex; justify-content: space-between; font-size: 16px; margin-top: 10px;}
+        }
+
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #ccc; border-radius: 22px; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 768px) {
+            aside {
+                position: fixed;
+                top: 0;
+                left: -270px; /* Hide sidebar */
+                height: 100vh;
+                transition: left 0.3s ease-in-out;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            }
+
+            aside.mobile-active {
+                left: 0;
+            }
+
+            main {
+                width: 100%;
+                padding: 4rem 1rem 1rem 1rem; /* Space for menu button */
+            }
+
+            .grid {
+                grid-template-columns: 1fr !important; /* Stack cards */
+            }
+
+            #sales .flex {
+                flex-direction: column;
+            }
+            
+            #sales .card {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block; /* Show on mobile */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-box { padding: 1rem; }
+            canvas { max-height: 250px !important; }
+            table { font-size: 0.8rem; }
+            th, td { padding: 0.5rem; }
+            .btn { width: 100%; margin-bottom: 0.5rem; }
+            .flex.justify-between .btn { width: auto; margin-bottom: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- AUTHENTICATION VIEW -->
+    <section id="auth-view">
+        <div class="card auth-box text-center">
+            <div style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"><i class="ph ph-printer"></i></div>
+            <h2 class="text-xl mb-4">GOSANDY PRINT MEDIA</h2>
+            <p class="text-muted text-sm mb-4">Secure Enterprise System</p>
+            
+            <form id="login-form">
+                <div class="input-group"><label>Username</label><input type="text" id="login-username" required></div>
+                <div class="input-group"><label>Password</label><input type="password" id="login-password" required></div>
+                <button type="submit" class="btn btn-primary w-full mb-4">Sign In</button>
+                <div class="flex justify-between">
+                    <span class="auth-link" onclick="ui.toggleAuth('reset')">Forgot Password?</span>
+                    <span class="auth-link" onclick="ui.toggleAuth('register')">Create Account</span>
+                </div>
+            </form>
+
+            <form id="register-form" class="hidden">
+                <div class="input-group"><label>Full Name</label><input type="text" id="reg-name" required></div>
+                <div class="input-group"><label>Username</label><input type="text" id="reg-username" required></div>
+                <div class="input-group"><label>Password</label><input type="password" id="reg-password" required></div>
+                <div class="input-group"><label>Role</label>
+                    <select id="reg-role" required onchange="ui.toggleBranchField(this.value)">
+                        <option value="">Select Role</option>
+                        <option value="BOSS">Head Office (Boss)</option>
+                        <option value="BRANCH_ADMIN">Branch Administrator</option>
+                        <option value="STAFF">Staff</option>
+                    </select>
+                </div>
+                <div class="input-group hidden" id="reg-branch-group">
+                    <label>Assign Branch</label>
+                    <select id="reg-branch">
+                        <option value="">Loading branches...</option>
+                    </select>
+                    <small class="text-muted" id="branch-hint">Ask Boss to create a branch if list is empty.</small>
+                </div>
+                <button type="submit" class="btn btn-primary w-full mb-4">Register Account</button>
+                <span class="auth-link" onclick="ui.toggleAuth('login')">Back to Login</span>
+            </form>
+
+            <form id="reset-form" class="hidden">
+                <div class="input-group"><label>Username</label><input type="text" id="reset-username" required></div>
+                <div class="input-group"><label>New Password</label><input type="password" id="reset-password" required></div>
+                <button type="submit" class="btn btn-warning w-full mb-4">Reset Password</button>
+                <span class="auth-link" onclick="ui.toggleAuth('login')">Cancel</span>
+            </form>
+        </div>
+    </section>
+
+    <!-- APP LAYOUT -->
+    <section id="app-layout" class="hidden">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" onclick="ui.toggleMobileMenu()">
+            <i class="ph ph-list"></i>
+        </button>
+
+        <aside>
+            <div class="flex items-center gap-2 mb-6" style="color: var(--accent);">
+                <i class="ph ph-printer" style="font-size: 1.8rem;"></i>
+                <span class="text-xl">GOSANDY</span>
+            </div>
+            <nav id="nav-menu"></nav>
+            
+            <div class="mt-auto pt-4 border-t" style="border-color: var(--border);">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm text-muted">Dark Mode</span>
+                    <label class="switch"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label>
+                </div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div style="width:32px; height:32px; background:var(--bg-input); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                        <i class="ph ph-user"></i>
+                    </div>
+                    <div>
+                        <div id="user-name" class="text-sm font-bold">User</div>
+                        <div id="user-role" class="text-sm text-muted">Role</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary w-full" onclick="app.logout()"><i class="ph ph-sign-out"></i> Logout</button>
+            </div>
+        </aside>
+
+        <main id="main-content">
+            <!-- Dynamic Content -->
+        </main>
+    </section>
+
+    <!-- PRINT TEMPLATE -->
+    <div id="print-area">
+        <div class="receipt-header">
+            <h2 style="margin:0;">GOSANDY PRINT MEDIA</h2>
+            <p id="print-branch">Branch Name</p>
+            <p id="print-date">Date</p>
+        </div>
+        <div class="receipt-row"><span>Customer:</span><span id="print-customer">Walk-in</span></div>
+        <div class="receipt-row"><span>Receipt ID:</span><span id="print-id">#000</span></div>
+        <div class="receipt-row"><span>Payment:</span><span id="print-method">Cash</span></div>
+        <hr style="border: 1px dashed #000; margin: 10px 0;">
+        <div id="print-items"></div>
+        <div id="print-discount"></div>
+        <div class="receipt-total">
+            <span>TOTAL</span>
+            <span id="print-total">GHS 0.00</span>
+        </div>
+        <div class="text-center" style="margin-top:20px; font-size:12px;">Thank you for choosing Gosandy!</div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal-container" class="hidden modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-xl">Title</h3>
+                <button class="btn btn-secondary" style="padding: 0.2rem 0.5rem;" onclick="ui.closeModal()"><i class="ph ph-x"></i></button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SYSTEM CORE ---
+        const INITIAL_DB = {
+            branches: [],
+            users: [],
+            services: [],
+            inventory: [],
+            sales: [],
+            discounts: [] 
+        };
+
+        class Database {
+            constructor() {
+                if (!localStorage.getItem('gosandy_secure_v3')) {
+                    localStorage.setItem('gosandy_secure_v3', JSON.stringify(INITIAL_DB));
+                }
+                this.data = JSON.parse(localStorage.getItem('gosandy_secure_v3'));
+            }
+            save() { localStorage.setItem('gosandy_secure_v3', JSON.stringify(this.data)); }
+            
+            getAll(table) { return this.data[table]; }
+            getById(table, id) { return this.data[table].find(i => i.id == id); }
+            add(table, item) {
+                item.id = Date.now(); item.created_at = new Date().toISOString();
+                this.data[table].push(item); this.save(); return item;
+            }
+            update(table, id, updates) {
+                const idx = this.data[table].findIndex(i => i.id == id);
+                if (idx > -1) { this.data[table][idx] = { ...this.data[table][idx], ...updates }; this.save(); return true; }
+                return false;
+            }
+            delete(table, id) {
+                this.data[table] = this.data[table].filter(i => i.id != id); this.save();
+            }
+        }
+
+        const db = new Database();
+        let currentUser = null;
+        let chartInstances = {};
+
+        // --- 2. SECURITY & HELPERS ---
+        
+        // Security: Sanitize inputs to prevent XSS
+        const sanitize = (str) => {
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        };
+
+        // Security: SHA-256 Hashing
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hash));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        const formatCurrency = (amount) => `GHS ${parseFloat(amount).toFixed(2)}`;
+        const showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.style.borderLeftColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            el.innerHTML = `<i class="ph ph-${type === 'success' ? 'check-circle' : 'warning-circle'}"></i> <span>${sanitize(msg)}</span>`;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        };
+
+        // --- 3. AUTHENTICATION ---
+        const auth = {
+            login: async (u, p) => {
+                // Security: Get user from DB, not just localStorage
+                const user = db.getAll('users').find(user => user.username === u);
+                if (user) {
+                    // Security: Compare Hash
+                    const hashedInput = await hashPassword(p);
+                    // NOTE: In this demo, previous passwords were stored as 'hash_pass'. 
+                    // For new registrations, they will be SHA-256.
+                    // We check both for backward compatibility.
+                    const isMatch = (hashedInput === user.password) || (user.password === 'hash_' + p);
+                    
+                    if (isMatch) {
+                        currentUser = user;
+                        app.init();
+                        return true;
+                    }
+                }
+                showToast('Invalid credentials', 'error'); 
+                return false;
+            },
+            register: async (name, user, pass, branch, role) => {
+                // Security: Username Check
+                if (db.getAll('users').find(u => u.username === user)) return showToast('Username taken', 'error');
+
+                // Security: ONE BOSS ONLY RULE
+                if (role === 'BOSS') {
+                    const hasBoss = db.getAll('users').some(u => u.role === 'BOSS');
+                    if (hasBoss) return showToast('System already has a Boss account.', 'error');
+                }
+
+                // Branch Validation
+                const bId = (role === 'BOSS') ? null : parseInt(branch);
+                if (role !== 'BOSS' && !bId) return showToast('Please select a branch', 'error');
+
+                if (role === 'BRANCH_ADMIN' && bId) {
+                    if (db.getAll('users').find(u => u.branch_id == bId && u.role === 'BRANCH_ADMIN')) 
+                        return showToast('Branch already has an Admin', 'error');
+                }
+                
+                // Security: Hash password before saving
+                const hashedPassword = await hashPassword(pass);
+                
+                db.add('users', { name: sanitize(name), username: sanitize(user), password: hashedPassword, role, branch_id: bId });
+                showToast('Registration successful'); ui.toggleAuth('login');
+            },
+            reset: async (u, p) => {
+                const user = db.getAll('users').find(user => user.username === u);
+                if (user) { 
+                    const hashedPassword = await hashPassword(p);
+                    db.update('users', user.id, { password: hashedPassword }); 
+                    showToast('Password updated'); ui.toggleAuth('login'); 
+                }
+                else showToast('User not found', 'error');
+            },
+            logout: () => {
+                currentUser = null;
+                document.getElementById('app-layout').classList.add('hidden');
+                document.getElementById('auth-view').classList.remove('hidden');
+            }
+        };
+
+        // --- 4. VIEWS CONTROLLER ---
+        const views = {
+            cart: [],
+            currentDiscount: null, 
+            load: (page) => {
+                const main = document.getElementById('main-content');
+                Object.values(chartInstances).forEach(c => c.destroy());
+                chartInstances = {};
+                
+                if (views[page]) main.innerHTML = views[page]();
+                else main.innerHTML = '<h1>404 Not Found</h1>';
+                
+                if (page === 'bossAnalytics') views.renderBossCharts();
+                if (page === 'staffPerformance') views.renderStaffCharts();
+            },
+
+            // --- BOSS VIEWS ---
+            bossOverview: () => {
+                const branches = db.getAll('branches');
+                const sales = db.getAll('sales');
+                const grandTotal = sales.reduce((sum, s) => sum + parseFloat(s.total_amount), 0);
+                const grandArrears = sales.filter(s => s.status === 'UNPAID').reduce((sum, s) => sum + parseFloat(s.total_amount), 0);
+
+                return `
+                    <header class="mb-6"><h2 class="text-xl">Executive Overview</h2><p class="text-muted">Company-wide Performance</p></header>
+                    <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem; margin-bottom:2rem;">
+                        <div class="card" style="border-left:4px solid var(--accent)">
+                            <div class="text-muted text-sm">Total Revenue</div>
+                            <div class="text-xl mt-2">${formatCurrency(grandTotal)}</div>
+                        </div>
+                        <div class="card" style="border-left:4px solid var(--danger)">
+                            <div class="text-muted text-sm">Total Arrears</div>
+                            <div class="text-xl mt-2 text-danger">${formatCurrency(grandArrears)}</div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg mb-4">Branch Breakdown</h3>
+                    <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1rem;">
+                        ${branches.length === 0 ? '<p class="text-muted">No branches created yet.</p>' : branches.map(b => {
+                            const bSales = sales.filter(s => s.branch_id === b.id);
+                            const total = bSales.reduce((sum, s) => sum + parseFloat(s.total_amount), 0);
+                            const arrears = bSales.filter(s => s.status === 'UNPAID').reduce((sum, s) => sum + parseFloat(s.total_amount), 0);
+                            return `
+                                <div class="card">
+                                    <div class="flex justify-between"><h4>${sanitize(b.name)}</h4><small class="text-muted">${sanitize(b.location)}</small></div>
+                                    <div class="mt-4 flex justify-between"><span>Revenue:</span><b>${formatCurrency(total)}</b></div>
+                                    <div class="flex justify-between text-danger"><span>Arrears:</span><b>${formatCurrency(arrears)}</b></div>
+                                </div>`;
+                        }).join('')}
+                    </div>
+                `;
+            },
+
+            manageBranches: () => {
+                const list = db.getAll('branches');
+                return `
+                    <header class="flex justify-between mb-6"><h2 class="text-xl">Manage Branches</h2>
+                    <button class="btn btn-primary" onclick="views.addBranchModal()"><i class="ph ph-plus"></i> Add Branch</button></header>
+                    <div class="card">
+                        <table><thead><tr><th>Name</th><th>Location</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            ${list.length === 0 ? '<tr><td colspan="3" class="text-center">No branches found.</td></tr>' : list.map(b => `
+                                <tr><td>${sanitize(b.name)}</td><td>${sanitize(b.location)}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="views.editBranchModal(${b.id})"><i class="ph ph-pencil-simple"></i></button>
+                                    <button class="btn btn-danger" onclick="if(confirm('Delete branch?')) { db.delete('branches', ${b.id}); views.load('manageBranches'); }"><i class="ph ph-trash"></i></button>
+                                </td></tr>
+                            `).join('')}
+                        </tbody></table>
+                    </div>`;
+            },
+            addBranchModal: () => {
+                ui.openModal('New Branch', `<form onsubmit="views.saveBranch(event)">
+                    <div class="input-group"><label>Name</label><input name="name" required></div>
+                    <div class="input-group"><label>Location</label><input name="loc" required></div>
+                    <button class="btn btn-primary w-full">Create Branch</button></form>`);
+            },
+            editBranchModal: (id) => {
+                const b = db.getById('branches', id);
+                ui.openModal('Edit Branch', `<form onsubmit="views.updateBranch(event, ${id})">
+                    <div class="input-group"><label>Name</label><input name="name" value="${sanitize(b.name)}" required></div>
+                    <div class="input-group"><label>Location</label><input name="loc" value="${sanitize(b.location)}" required></div>
+                    <button class="btn btn-primary w-full">Update Branch</button></form>`);
+            },
+            saveBranch: (e) => {
+                e.preventDefault();
+                db.add('branches', { name: sanitize(e.target.name.value), location: sanitize(e.target.loc.value) });
+                ui.closeModal(); showToast('Branch created'); views.load('manageBranches');
+            },
+            updateBranch: (e, id) => {
+                e.preventDefault();
+                db.update('branches', id, { name: sanitize(e.target.name.value), location: sanitize(e.target.loc.value) });
+                ui.closeModal(); showToast('Branch updated'); views.load('manageBranches');
+            },
+
+            bossAnalytics: () => {
+                return `
+                    <header class="mb-6"><h2 class="text-xl">Performance Analytics</h2><p class="text-muted">Comparative view of all branches</p></header>
+                    <div class="card" style="height:400px; margin-bottom:2rem;"><h3 class="text-center">Revenue Comparison by Branch</h3><canvas id="bossChartRev"></canvas></div>
+                    <div class="card" style="height:400px;"><h3 class="text-center">Arrears Distribution</h3><canvas id="bossChartArr"></canvas></div>
+                `;
+            },
+            renderBossCharts: () => {
+                const branches = db.getAll('branches');
+                const sales = db.getAll('sales');
+                
+                const labels = branches.map(b => b.name);
+                const revData = branches.map(b => sales.filter(s => s.branch_id === b.id).reduce((sum,s) => sum + parseFloat(s.total_amount), 0));
+                const arrData = branches.map(b => sales.filter(s => s.branch_id === b.id && s.status === 'UNPAID').reduce((sum,s) => sum + parseFloat(s.total_amount), 0));
+
+                if(branches.length === 0) {
+                    document.getElementById('bossChartRev').parentElement.innerHTML += '<p class="text-center text-muted">No data available yet.</p>';
+                    return;
+                }
+
+                new Chart(document.getElementById('bossChartRev'), {
+                    type: 'bar', data: { labels, datasets: [{ label: 'Revenue (GHS)', data: revData, backgroundColor: 'rgba(37, 99, 235, 0.7)' }] }
+                });
+                new Chart(document.getElementById('bossChartArr'), {
+                    type: 'pie', data: { labels, datasets: [{ data: arrData, backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#6366f1'] }] }
+                });
+            },
+
+            // --- BRANCH ADMIN VIEWS ---
+            dashboard: () => {
+                // Security: Re-validate user role on load
+                const dbUser = db.getById('users', currentUser.id);
+                if(!dbUser || dbUser.role !== currentUser.role) {
+                    auth.logout();
+                    return `<div class="text-danger">Session Invalid. Login again.</div>`;
+                }
+
+                let sales = [];
+                if (currentUser.role === 'BRANCH_ADMIN') sales = db.getAll('sales').filter(s => s.branch_id === currentUser.branch_id);
+                else sales = db.getAll('sales').filter(s => s.user_id === currentUser.id);
+
+                const total = sales.reduce((sum, s) => sum + parseFloat(s.total_amount), 0);
+                const arrears = sales.filter(s => s.status === 'UNPAID').reduce((sum, s) => sum + parseFloat(s.total_amount), 0);
+
+                return `
+                    <header class="mb-6"><h2 class="text-xl">Dashboard</h2><p class="text-muted">Welcome, ${sanitize(currentUser.name)}</p></header>
+                    <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-bottom:2rem;">
+                        <div class="card"><div class="text-muted">Total Revenue</div><div class="text-xl mt-2">${formatCurrency(total)}</div></div>
+                        <div class="card"><div class="text-muted">Arrears</div><div class="text-xl mt-2 text-danger">${formatCurrency(arrears)}</div></div>
+                        <div class="card"><div class="text-muted">Transactions</div><div class="text-xl mt-2">${sales.length}</div></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-lg mb-4">Recent Transactions</h3>
+                        <table><thead><tr><th>ID</th><th>Date</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody>
+                            ${sales.slice(-5).reverse().map(s => `
+                                <tr><td>#${s.id.toString().slice(-4)}</td><td>${new Date(s.date).toLocaleDateString()}</td><td>${formatCurrency(s.total_amount)}</td>
+                                <td><span style="color:${s.status === 'PAID' ? 'var(--success)' : 'var(--danger)'}">${s.status}</span></td>
+                                <td><button class="btn btn-secondary" onclick='ui.printReceipt(${JSON.stringify(s)})'><i class="ph ph-printer"></i></button></td></tr>
+                            `).join('')}
+                        </tbody></table>
+                    </div>`;
+            },
+
+            staffPerformance: () => {
+                if (currentUser.role !== 'BRANCH_ADMIN') return `<h2 class="text-xl">Access Denied</h2>`;
+                
+                const staffList = db.getAll('users').filter(u => u.role === 'STAFF' && u.branch_id === currentUser.branch_id);
+                const sales = db.getAll('sales').filter(s => s.branch_id === currentUser.branch_id);
+
+                const staffStats = staffList.map(staff => {
+                    const staffSales = sales.filter(s => s.user_id === staff.id);
+                    const total = staffSales.reduce((sum, s) => sum + parseFloat(s.total_amount), 0);
+                    return { name: staff.name, total: total, count: staffSales.length };
+                });
+
+                return `
+                    <header class="mb-6"><h2 class="text-xl">Staff Performance</h2><p class="text-muted">Viewing performance for your branch</p></header>
+                    
+                    <div class="card" style="height:400px; margin-bottom:2rem;">
+                        <h3 class="text-center">Revenue Generated per Staff</h3>
+                        <canvas id="staffChartRev"></canvas>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="text-lg mb-4">Performance Breakdown</h3>
+                        <table><thead><tr><th>Staff Name</th><th>Total Revenue</th><th>Transactions</th></tr></thead>
+                        <tbody>
+                            ${staffStats.length === 0 ? '<tr><td colspan="3" class="text-center">No staff found in this branch.</td></tr>' : 
+                            staffStats.map(s => `<tr><td>${sanitize(s.name)}</td><td>${formatCurrency(s.total)}</td><td>${s.count}</td></tr>`).join('')}
+                        </tbody></table>
+                    </div>
+                `;
+            },
+            renderStaffCharts: () => {
+                const staffList = db.getAll('users').filter(u => u.role === 'STAFF' && u.branch_id === currentUser.branch_id);
+                const sales = db.getAll('sales').filter(s => s.branch_id === currentUser.branch_id);
+
+                const labels = staffList.map(s => s.name);
+                const data = staffList.map(s => sales.filter(x => x.user_id === s.id).reduce((sum, x) => sum + parseFloat(x.total_amount), 0));
+
+                if(staffList.length === 0) {
+                    document.getElementById('staffChartRev').parentElement.innerHTML += '<p class="text-center text-muted">No staff data to display.</p>';
+                    return;
+                }
+
+                new Chart(document.getElementById('staffChartRev'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Revenue (GHS)',
+                            data: data,
+                            backgroundColor: 'rgba(16, 185, 129, 0.7)'
+                        }]
+                    }
+                });
+            },
+
+            sales: () => {
+                views.currentDiscount = null; // Reset discount on load
+                const services = db.getAll('services').filter(s => s.branch_id === currentUser.branch_id);
+                const discounts = db.getAll('discounts').filter(d => d.branch_id === currentUser.branch_id);
+                return `
+                    <header class="mb-6"><h2 class="text-xl">Point of Sale</h2></header>
+                    <div class="flex gap-4" style="flex-wrap:wrap;">
+                        <div class="card" style="flex:1; min-width:300px;">
+                            <h3 class="text-lg mb-4">New Transaction</h3>
+                            <div class="input-group"><label>Customer Name</label><input type="text" id="pos-customer" placeholder="Walk-in Customer"></div>
+                            <div class="input-group">
+                                <label>Service</label>
+                                <select id="pos-service">
+                                    ${services.length === 0 ? '<option value="">No services available</option>' : 
+                                    services.map(s => `<option value="${s.id}" data-price="${s.price}" data-name="${s.name}">${sanitize(s.name)} - ${formatCurrency(s.price)}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="input-group" style="flex:1"><label>Qty</label><input type="number" id="pos-qty" value="1" min="1"></div>
+                                <div class="input-group" style="flex:1"><label>Payment</label>
+                                    <select id="pos-payment">
+                                        <option value="CASH">Cash</option>
+                                        <option value="MOMO">Momo</option>
+                                        <option value="BANK">Bank Transfer</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <!-- DISCOUNT DROPDOWN -->
+                            <div class="input-group">
+                                <label>Apply Discount</label>
+                                <select id="pos-discount" onchange="views.applyDiscount(this.value)">
+                                    <option value="">No Discount</option>
+                                    ${discounts.map(d => `<option value="${d.id}" data-type="${d.type}" data-val="${d.value}">${sanitize(d.name)} (${d.type === 'PERCENT' ? d.value + '%' : formatCurrency(d.value)})</option>`).join('')}
+                                </select>
+                            </div>
+                            <button class="btn btn-primary w-full" onclick="views.addToCart()">Add Item</button>
+                        </div>
+                        <div class="card" style="flex:1; min-width:300px;">
+                            <h3 class="text-lg mb-4">Current Order</h3>
+                            <div id="cart-items" style="min-height:150px; margin-bottom:1rem;"><p class="text-muted text-center">Cart Empty</p></div>
+                            <div class="flex justify-between items-center pt-4 border-t">
+                                <span class="text-xl">Total: <span id="cart-total">GHS 0.00</span></span>
+                                <button class="btn btn-primary" onclick="views.checkout()">Complete Sale</button>
+                            </div>
+                        </div>
+                    </div>`;
+            },
+            addToCart: () => {
+                const select = document.getElementById('pos-service');
+                if(!select.value) return showToast('Please create services first', 'error');
+                const item = {
+                    id: select.value,
+                    name: select.options[select.selectedIndex].dataset.name,
+                    price: parseFloat(select.options[select.selectedIndex].dataset.price),
+                    qty: parseInt(document.getElementById('pos-qty').value),
+                    payment: document.getElementById('pos-payment').value
+                };
+                item.total = item.price * item.qty;
+                views.cart.push(item);
+                views.renderCart();
+            },
+            applyDiscount: (id) => {
+                if(!id) { views.currentDiscount = null; }
+                else { views.currentDiscount = db.getById('discounts', id); }
+                views.renderCart(); // Re-render to show new totals
+            },
+            renderCart: () => {
+                const div = document.getElementById('cart-items');
+                const totalEl = document.getElementById('cart-total');
+                if(views.cart.length === 0) { div.innerHTML = '<p class="text-muted text-center">Cart Empty</p>'; totalEl.innerText = 'GHS 0.00'; return; }
+                
+                let subTotal = views.cart.reduce((sum, i) => sum + i.total, 0);
+                let discountAmount = 0;
+
+                // DISCOUNT LOGIC
+                if (views.currentDiscount) {
+                    if (views.currentDiscount.type === 'PERCENT') {
+                        discountAmount = subTotal * (views.currentDiscount.value / 100);
+                    } else {
+                        discountAmount = views.currentDiscount.value;
+                    }
+                }
+                // Cap discount at subtotal
+                if (discountAmount > subTotal) discountAmount = subTotal;
+                
+                let grandTotal = subTotal - discountAmount;
+
+                div.innerHTML = views.cart.map((i, idx) => {
+                    return `<div class="flex justify-between p-2 border-b"><div><b>${sanitize(i.name)}</b><br><small>${i.qty} x ${formatCurrency(i.price)} (${i.payment})</small></div>
+                    <div class="flex items-center gap-2"><span>${formatCurrency(i.total)}</span><button class="btn btn-danger" style="padding:2px 6px;" onclick="views.cart.splice(${idx},1); views.renderCart()">x</button></div></div>`;
+                }).join('');
+
+                // DISPLAY TOTAL LOGIC
+                totalEl.innerHTML = `
+                    ${views.currentDiscount ? `<small style="text-decoration:line-through; color:gray;">${formatCurrency(subTotal)}</small><br>` : ''}
+                    ${views.currentDiscount ? `<small class="text-success">-${formatCurrency(discountAmount)} (${sanitize(views.currentDiscount.name)})</small><br>` : ''}
+                    ${formatCurrency(grandTotal)}
+                `;
+            },
+            checkout: () => {
+                if(views.cart.length === 0) return showToast('Cart is empty', 'error');
+                const cust = document.getElementById('pos-customer').value || "Walk-in";
+                
+                // CALCULATE TOTALS AGAIN FOR DB
+                let subTotal = views.cart.reduce((s, i) => s + i.total, 0);
+                let discountAmount = 0;
+                if (views.currentDiscount) {
+                    discountAmount = (views.currentDiscount.type === 'PERCENT') ? subTotal * (views.currentDiscount.value / 100) : views.currentDiscount.value;
+                    if(discountAmount > subTotal) discountAmount = subTotal;
+                }
+                let finalTotal = subTotal - discountAmount;
+                
+                const sale = db.add('sales', {
+                    branch_id: currentUser.branch_id, user_id: currentUser.id,
+                    customer: sanitize(cust), items: views.cart, total_amount: finalTotal,
+                    payment_method: views.cart[0].payment, 
+                    status: 'PAID', 
+                    discount_applied: views.currentDiscount ? sanitize(views.currentDiscount.name) : null, 
+                    discount_amount: discountAmount, 
+                    date: new Date().toISOString()
+                });
+
+                showToast('Sale Recorded');
+                ui.printReceipt(sale);
+                views.cart = [];
+                views.currentDiscount = null;
+                views.renderCart();
+                document.getElementById('pos-customer').value = '';
+            },
+
+            services: () => {
+                if (currentUser.role !== 'BRANCH_ADMIN') return `<h2 class="text-xl">Access Denied</h2>`;
+                const list = db.getAll('services').filter(s => s.branch_id === currentUser.branch_id);
+                return `
+                    <header class="flex justify-between mb-6"><h2 class="text-xl">Service Management</h2>
+                    <button class="btn btn-primary" onclick="views.addServiceModal()"><i class="ph ph-plus"></i> Add Service</button></header>
+                    <div class="card">
+                        <table><thead><tr><th>Service Name</th><th>Price</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            ${list.length === 0 ? '<tr><td colspan="3" class="text-center">No services yet.</td></tr>' :
+                            list.map(s => `
+                                <tr><td>${sanitize(s.name)}</td><td>${formatCurrency(s.price)}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="views.editServiceModal(${s.id})">Edit</button>
+                                    <button class="btn btn-danger" onclick="if(confirm('Delete service?')) { db.delete('services', ${s.id}); views.load('services'); }">Delete</button>
+                                </td></tr>
+                            `).join('')}
+                        </tbody></table>
+                    </div>`;
+            },
+            addServiceModal: () => {
+                ui.openModal('Add Service', `<form onsubmit="views.saveService(event)">
+                    <div class="input-group"><label>Service Name</label><input name="name" required></div>
+                    <div class="input-group"><label>Price (GHS)</label><input type="number" step="0.01" name="price" required></div>
+                    <button class="btn btn-primary w-full">Save Service</button></form>`);
+            },
+            editServiceModal: (id) => {
+                const s = db.getById('services', id);
+                ui.openModal('Edit Service', `<form onsubmit="views.updateService(event, ${id})">
+                    <div class="input-group"><label>Service Name</label><input name="name" value="${sanitize(s.name)}" required></div>
+                    <div class="input-group"><label>Price (GHS)</label><input type="number" step="0.01" name="price" value="${s.price}" required></div>
+                    <button class="btn btn-primary w-full">Update Service</button></form>`);
+            },
+            saveService: (e) => {
+                e.preventDefault();
+                db.add('services', { branch_id: currentUser.branch_id, name: sanitize(e.target.name.value), price: parseFloat(e.target.price.value) });
+                ui.closeModal(); showToast('Service added'); views.load('services');
+            },
+            updateService: (e, id) => {
+                e.preventDefault();
+                db.update('services', id, { name: sanitize(e.target.name.value), price: parseFloat(e.target.price.value) });
+                ui.closeModal(); showToast('Service updated'); views.load('services');
+            },
+
+            inventory: () => {
+                if (currentUser.role !== 'BRANCH_ADMIN') return `<h2 class="text-xl">Access Denied</h2>`;
+                const list = db.getAll('inventory').filter(i => i.branch_id === currentUser.branch_id);
+                return `
+                    <header class="flex justify-between mb-6"><h2 class="text-xl">Inventory Management</h2>
+                    <button class="btn btn-primary" onclick="views.addInventoryModal()"><i class="ph ph-plus"></i> Add Item</button></header>
+                    <div class="card">
+                        <table><thead><tr><th>Item Name</th><th>Stock Qty</th><th>Unit Price</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            ${list.length === 0 ? '<tr><td colspan="4" class="text-center">Inventory is empty.</td></tr>' :
+                            list.map(i => `
+                                <tr><td>${sanitize(i.name)}</td><td><span style="color:${i.quantity < 10 ? 'red' : 'green'}">${i.quantity}</span></td><td>${formatCurrency(i.unit_price)}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="views.editInventoryModal(${i.id})">Edit</button>
+                                    <button class="btn btn-danger" onclick="if(confirm('Delete item?')) { db.delete('inventory', ${i.id}); views.load('inventory'); }">Delete</button>
+                                </td></tr>
+                            `).join('')}
+                        </tbody></table>
+                    </div>`;
+            },
+            addInventoryModal: () => {
+                ui.openModal('Add Inventory', `<form onsubmit="views.saveInventory(event)">
+                    <div class="input-group"><label>Item Name</label><input name="name" required></div>
+                    <div class="input-group"><label>Quantity</label><input type="number" name="qty" required></div>
+                    <div class="input-group"><label>Unit Price</label><input type="number" step="0.01" name="price" required></div>
+                    <button class="btn btn-primary w-full">Save Item</button></form>`);
+            },
+            editInventoryModal: (id) => {
+                const i = db.getById('inventory', id);
+                ui.openModal('Edit Inventory', `<form onsubmit="views.updateInventory(event, ${id})">
+                    <div class="input-group"><label>Item Name</label><input name="name" value="${sanitize(i.name)}" required></div>
+                    <div class="input-group"><label>Quantity (Current Stock)</label><input type="number" name="qty" value="${i.quantity}" required></div>
+                    <div class="input-group"><label>Unit Price</label><input type="number" step="0.01" name="price" value="${i.unit_price}" required></div>
+                    <button class="btn btn-primary w-full">Update Item</button></form>`);
+            },
+            saveInventory: (e) => {
+                e.preventDefault();
+                db.add('inventory', { branch_id: currentUser.branch_id, name: sanitize(e.target.name.value), quantity: parseInt(e.target.qty.value), unit_price: parseFloat(e.target.price.value) });
+                ui.closeModal(); showToast('Item added'); views.load('inventory');
+            },
+            updateInventory: (e, id) => {
+                e.preventDefault();
+                db.update('inventory', id, { name: sanitize(e.target.name.value), quantity: parseInt(e.target.qty.value), unit_price: parseFloat(e.target.price.value) });
+                ui.closeModal(); showToast('Inventory updated'); views.load('inventory');
+            },
+
+            // --- NEW: DISCOUNT MANAGEMENT VIEWS ---
+            discounts: () => {
+                if (currentUser.role !== 'BRANCH_ADMIN') return `<h2 class="text-xl">Access Denied</h2>`;
+                const list = db.getAll('discounts').filter(d => d.branch_id === currentUser.branch_id);
+                return `
+                    <header class="flex justify-between mb-6">
+                        <h2 class="text-xl">Discount Management</h2>
+                        <button class="btn btn-primary" onclick="views.addDiscountModal()"><i class="ph ph-plus"></i> Add Discount</button>
+                    </header>
+                    <div class="card">
+                        <table>
+                            <thead><tr><th>Discount Name</th><th>Type</th><th>Value</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                ${list.length === 0 ? '<tr><td colspan="4" class="text-center">No discounts configured.</td></tr>' : 
+                                list.map(d => `
+                                    <tr>
+                                        <td>${sanitize(d.name)}</td>
+                                        <td>${d.type}</td>
+                                        <td>${d.type === 'PERCENT' ? d.value + '%' : formatCurrency(d.value)}</td>
+                                        <td>
+                                            <button class="btn btn-secondary" onclick="views.editDiscountModal(${d.id})">Edit</button>
+                                            <button class="btn btn-danger" onclick="if(confirm('Delete discount?')) { db.delete('discounts', ${d.id}); views.load('discounts'); }">Delete</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>`;
+            },
+            addDiscountModal: () => {
+                ui.openModal('Add Discount', `
+                    <form onsubmit="views.saveDiscount(event)">
+                        <div class="input-group"><label>Name</label><input name="name" placeholder="e.g. Student Discount" required></div>
+                        <div class="input-group"><label>Type</label>
+                            <select name="type">
+                                <option value="PERCENT">Percentage (%)</option>
+                                <option value="FIXED">Fixed Amount (GHS)</option>
+                            </select>
+                        </div>
+                        <div class="input-group"><label>Value</label><input type="number" name="value" required></div>
+                        <button class="btn btn-primary w-full">Save Discount</button>
+                    </form>`);
+            },
+            editDiscountModal: (id) => {
+                const d = db.getById('discounts', id);
+                ui.openModal('Edit Discount', `
+                    <form onsubmit="views.updateDiscount(event, ${id})">
+                        <div class="input-group"><label>Name</label><input name="name" value="${sanitize(d.name)}" required></div>
+                        <div class="input-group"><label>Type</label>
+                            <select name="type">
+                                <option value="PERCENT" ${d.type === 'PERCENT' ? 'selected' : ''}>Percentage (%)</option>
+                                <option value="FIXED" ${d.type === 'FIXED' ? 'selected' : ''}>Fixed Amount (GHS)</option>
+                            </select>
+                        </div>
+                        <div class="input-group"><label>Value</label><input type="number" name="value" value="${d.value}" required></div>
+                        <button class="btn btn-primary w-full">Update Discount</button>
+                    </form>`);
+            },
+            saveDiscount: (e) => {
+                e.preventDefault();
+                db.add('discounts', { branch_id: currentUser.branch_id, name: sanitize(e.target.name.value), type: e.target.type.value, value: parseFloat(e.target.value.value) });
+                ui.closeModal(); showToast('Discount added'); views.load('discounts');
+            },
+            updateDiscount: (e, id) => {
+                e.preventDefault();
+                db.update('discounts', id, { name: sanitize(e.target.name.value), type: e.target.type.value, value: parseFloat(e.target.value.value) });
+                ui.closeModal(); showToast('Discount updated'); views.load('discounts');
+            },
+
+            users: () => {
+                let users = [];
+                if (currentUser.role === 'BOSS') users = db.getAll('users');
+                else if (currentUser.role === 'BRANCH_ADMIN') users = db.getAll('users').filter(u => u.branch_id === currentUser.branch_id);
+                return `
+                    <header class="mb-6"><h2 class="text-xl">User Directory</h2></header>
+                    <div class="card">
+                        <table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Branch</th></tr></thead>
+                        <tbody>
+                            ${users.length === 0 ? '<tr><td colspan="4" class="text-center">No users registered yet.</td></tr>' :
+                            users.map(u => `<tr><td>${sanitize(u.name)}</td><td>${u.role}</td><td>${u.username}</td><td>${u.branch_id ? db.getById('branches', u.branch_id)?.name : 'Head Office'}</td></tr>`).join('')}
+                        </tbody></table>
+                    </div>`;
+            }
+        };
+
+        // --- 5. UI HANDLERS ---
+        const ui = {
+            toggleAuth: (view) => {
+                document.getElementById('login-form').classList.toggle('hidden', view !== 'login');
+                document.getElementById('register-form').classList.toggle('hidden', view !== 'register');
+                document.getElementById('reset-form').classList.toggle('hidden', view !== 'reset');
+                
+                if (view === 'register') {
+                    refreshBranchDropdown();
+                }
+            },
+            toggleBranchField: (role) => {
+                const grp = document.getElementById('reg-branch-group');
+                const select = document.getElementById('reg-branch');
+                const hasBoss = db.getAll('users').some(u => u.role === 'BOSS');
+                
+                if(role === 'BOSS') { grp.classList.add('hidden'); }
+                else { grp.classList.remove('hidden'); }
+            },
+            toggleMobileMenu: () => {
+                const sidebar = document.getElementById('app-layout').querySelector('aside');
+                sidebar.classList.toggle('mobile-active');
+            },
+            openModal: (title, html) => {
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-body').innerHTML = html;
+                document.getElementById('modal-container').classList.remove('hidden');
+            },
+            closeModal: () => {
+                document.getElementById('modal-container').classList.add('hidden');
+            },
+            toggleTheme: () => {
+                const body = document.body;
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            },
+            printReceipt: (sale) => {
+                const branch = db.getById('branches', sale.branch_id);
+                document.getElementById('print-branch').innerText = branch ? sanitize(branch.name) : 'Branch';
+                document.getElementById('print-date').innerText = new Date(sale.date).toLocaleString();
+                document.getElementById('print-customer').innerText = sanitize(sale.customer);
+                document.getElementById('print-id').innerText = '#' + sale.id.toString().slice(-6);
+                document.getElementById('print-method').innerText = sale.payment_method;
+                
+                let html = '';
+                sale.items.forEach(i => {
+                    html += `<div class="receipt-row"><span>${sanitize(i.name)} x${i.qty}</span><span>${formatCurrency(i.total)}</span></div>`;
+                });
+                document.getElementById('print-items').innerHTML = html;
+                
+                // PRINT DISCOUNT LINE
+                if(sale.discount_applied) {
+                    document.getElementById('print-discount').innerHTML = `
+                        <div class="receipt-row text-success"><span>Discount (${sale.discount_applied})</span><span>-${formatCurrency(sale.discount_amount)}</span></div>
+                    `;
+                } else {
+                    document.getElementById('print-discount').innerHTML = '';
+                }
+
+                document.getElementById('print-total').innerText = formatCurrency(sale.total_amount);
+                window.print();
+            }
+        };
+
+        const app = {
+            init: () => {
+                document.getElementById('auth-view').classList.add('hidden');
+                document.getElementById('app-layout').classList.remove('hidden');
+                document.getElementById('user-name').innerText = sanitize(currentUser.name);
+                document.getElementById('user-role').innerText = currentUser.role.replace('_', ' ');
+
+                const nav = document.getElementById('nav-menu');
+                nav.innerHTML = '';
+                
+                let items = [];
+                if(currentUser.role === 'BOSS') {
+                    items = [
+                        {id:'bossOverview', label:'Overview', icon:'squares-four'},
+                        {id:'manageBranches', label:'Branches', icon:'buildings'},
+                        {id:'bossAnalytics', label:'Performance', icon:'chart-bar'},
+                        {id:'users', label:'Users', icon:'users'}
+                    ];
+                } else if (currentUser.role === 'BRANCH_ADMIN') {
+                    items = [
+                        {id:'dashboard', label:'Dashboard', icon:'squares-four'},
+                        {id:'staffPerformance', label:'Staff Performance', icon:'chart-line-up'},
+                        {id:'sales', label:'Point of Sale', icon:'cash-register'},
+                        {id:'services', label:'Services', icon:'tag'},
+                        {id:'inventory', label:'Inventory', icon:'package'},
+                        {id:'discounts', label:'Discounts', icon:'percent'},
+                        {id:'users', label:'Users', icon:'users'}
+                    ];
+                } else {
+                    items = [
+                        {id:'dashboard', label:'Dashboard', icon:'squares-four'},
+                        {id:'sales', label:'Point of Sale', icon:'cash-register'},
+                        {id:'users', label:'Users', icon:'users'}
+                    ];
+                }
+
+                items.forEach(i => {
+                    const el = document.createElement('a');
+                    el.className = 'nav-item';
+                    el.innerHTML = `<i class="ph ph-${i.icon}"></i> ${i.label}`;
+                    el.onclick = () => views.load(i.id);
+                    nav.appendChild(el);
+                });
+                
+                // Load Initial Page
+                if(currentUser.role === 'BOSS') views.load('bossOverview');
+                else views.load('dashboard');
+            },
+            logout: () => auth.logout()
+        };
+
+        // --- EVENTS ---
+        
+        const refreshBranchDropdown = () => {
+            const select = document.getElementById('reg-branch');
+            const hint = document.getElementById('branch-hint');
+            if (select) {
+                const branches = db.getAll('branches');
+                
+                if (branches.length === 0) {
+                    select.innerHTML = '<option value="">No branches available</option>';
+                    if(hint) hint.innerText = "Please ask Boss to create a branch first.";
+                    select.disabled = true;
+                } else {
+                    select.innerHTML = branches.map(b => `<option value="${b.id}">${sanitize(b.name)}</option>`).join('');
+                    if(hint) hint.innerText = "";
+                    select.disabled = false;
+                }
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshBranchDropdown(); 
+        });
+
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault(); 
+            if(db.getAll('users').length === 0) showToast('No users exist. Please register.', 'error');
+            else await auth.login(document.getElementById('login-username').value, document.getElementById('login-password').value);
+        };
+        document.getElementById('register-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const role = document.getElementById('reg-role').value;
+            const branch = document.getElementById('reg-branch').value;
+            await auth.register(
+                document.getElementById('reg-name').value, 
+                document.getElementById('reg-username').value, 
+                document.getElementById('reg-password').value, 
+                branch, 
+                role
+            );
+        };
+        document.getElementById('reset-form').onsubmit = async (e) => {
+            e.preventDefault();
+            await auth.reset(document.getElementById('reset-username').value, document.getElementById('reset-password').value);
+        };
+        document.getElementById('theme-toggle').onchange = ui.toggleTheme;
+
+    </script>
+</body>
+</html>
