@@ -1,0 +1,118 @@
+{
+  "branches": [
+    {
+      "name": "KAAF",
+      "location": "KAAF University - Main Campus",
+      "id": 1767173544248,
+      "created_at": "2025-12-31T09:32:24.248Z"
+    },
+    {
+      "name": "ATU",
+      "location": "Accra Technical University - Accra Central",
+      "id": 1767173562104,
+      "created_at": "2025-12-31T09:32:42.104Z"
+    },
+    {
+      "name": "UEW",
+      "location": "Winneba - North Campus",
+      "id": 1767173575600,
+      "created_at": "2025-12-31T09:32:55.600Z"
+    }
+  ],
+  "users": [],
+  "services": [
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing (A4 b/w)",
+      "price": 0.5,
+      "id": 1767173776881,
+      "created_at": "2025-12-31T09:36:16.881Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A4 color (1-sided) ",
+      "price": 2,
+      "id": 1767173844673,
+      "created_at": "2025-12-31T09:37:24.673Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A4 color (2-sided) ",
+      "price": 3,
+      "id": 1767173871557,
+      "created_at": "2025-12-31T09:37:51.557Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A3 b/w (1-sided) ",
+      "price": 1.5,
+      "id": 1767173970776,
+      "created_at": "2025-12-31T09:39:30.776Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A3 b/w (2-sided) ",
+      "price": 2,
+      "id": 1767174087568,
+      "created_at": "2025-12-31T09:41:27.568Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A4 full color (1-sided)",
+      "price": 3,
+      "id": 1767174530273,
+      "created_at": "2025-12-31T09:48:50.273Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A4 full color (2-sided)",
+      "price": 4,
+      "id": 1767174579440,
+      "created_at": "2025-12-31T09:49:39.440Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A3 full color (1-sided)",
+      "price": 4,
+      "id": 1767174730344,
+      "created_at": "2025-12-31T09:52:10.344Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Printing - A3 full color (2-sided)",
+      "price": 5,
+      "id": 1767174783032,
+      "created_at": "2025-12-31T09:53:03.032Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Photocopy - A4 b/w",
+      "price": 0.5,
+      "id": 1767175032447,
+      "created_at": "2025-12-31T09:57:12.447Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Photocopy - A4 color",
+      "price": 2,
+      "id": 1767175077089,
+      "created_at": "2025-12-31T09:57:57.089Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Photocopy - A3 b/w",
+      "price": 1.5,
+      "id": 1767175266680,
+      "created_at": "2025-12-31T10:01:06.680Z"
+    },
+    {
+      "branch_id": 1767173544248,
+      "name": "Photocopy - A3 color ",
+      "price": 2.5,
+      "id": 1767175299736,
+      "created_at": "2025-12-31T10:01:39.736Z"
+    }
+  ],
+  "inventory": [],
+  "sales": []
+}
