@@ -358,6 +358,7 @@
 
     <script>
         // --- 1. SYSTEM CORE ---
+               // --- 1. SYSTEM CORE (HYBRID SUPPORT) ---
         const INITIAL_DB = {
             branches: [],
             users: [],
@@ -369,33 +370,104 @@
 
         class Database {
             constructor() {
-                if (!localStorage.getItem('gosandy_secure_v3')) {
-                    localStorage.setItem('gosandy_secure_v3', JSON.stringify(INITIAL_DB));
-                }
-                this.data = JSON.parse(localStorage.getItem('gosandy_secure_v3'));
+                // 1. Try to detect if we are on localhost or a remote server
+                // If you are hosting on Render/Vercel, put that URL here. 
+                // If hosting locally on LAN, use your IP like 'http://192.168.1.5:3000'
+                this.api = 'http://localhost:3000/api/database'; 
+                
+                // Initialize state
+                this.isOnline = false; 
+                this.data = INITIAL_DB;
+
+                // 2. Try to sync immediately on load
+                this.sync();
             }
-            save() { localStorage.setItem('gosandy_secure_v3', JSON.stringify(this.data)); }
-            
+
+            // SMART SYNC: Tries to fetch from server, falls back to LocalStorage
+            async sync() {
+                try {
+                    const response = await fetch(this.api, { 
+                        method: 'GET',
+                        cache: 'no-cache', // Ensure we get fresh data
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    if (response.ok) {
+                        this.data = await response.json();
+                        this.isOnline = true;
+                        // Update local cache with fresh server data
+                        localStorage.setItem('gosandy_secure_v3', JSON.stringify(this.data));
+                        console.log('✅ Connected to Server: Data Synced');
+                        return;
+                    } else {
+                        throw new Error('Server error');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Server Unreachable. Switching to Offline Mode.');
+                    this.isOnline = false;
+                    // Load from local storage cache
+                    const localData = localStorage.getItem('gosandy_secure_v3');
+                    if (localData) {
+                        this.data = JSON.parse(localData);
+                    }
+                }
+            }
+
             getAll(table) { return this.data[table]; }
             getById(table, id) { return this.data[table].find(i => i.id == id); }
+            
             add(table, item) {
-                item.id = Date.now(); item.created_at = new Date().toISOString();
-                this.data[table].push(item); this.save(); return item;
+                item.id = Date.now(); 
+                item.created_at = new Date().toISOString();
+                this.data[table].push(item); 
+                
+                // Save locally immediately so UI is fast
+                localStorage.setItem('gosandy_secure_v3', JSON.stringify(this.data));
+                
+                // Push to server if possible
+                this.save(); 
+                return item;
             }
+            
             update(table, id, updates) {
                 const idx = this.data[table].findIndex(i => i.id == id);
-                if (idx > -1) { this.data[table][idx] = { ...this.data[table][idx], ...updates }; this.save(); return true; }
+                if (idx > -1) { 
+                    this.data[table][idx] = { ...this.data[table][idx], ...updates }; 
+                    localStorage.setItem('gosandy_secure_v3', JSON.stringify(this.data));
+                    this.save();
+                    return true; 
+                }
                 return false;
             }
+            
             delete(table, id) {
-                this.data[table] = this.data[table].filter(i => i.id != id); this.save();
+                this.data[table] = this.data[table].filter(i => i.id != id); 
+                localStorage.setItem('gosandy_secure_v3', JSON.stringify(this.data));
+                this.save();
+            }
+
+            // SAVE: Pushes changes to server, but catches errors silently
+            async save() {
+                // Always save to localStorage (Source of Truth for Offline Mode)
+                localStorage.setItem('gosandy_secure_v3', JSON.stringify(this.data));
+
+                if (!this.isOnline) {
+                    console.log('💾 Offline Mode: Changes saved to Local Storage only.');
+                    return;
+                }
+
+                try {
+                    await fetch(this.api, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.data)
+                    });
+                    // console.log('☁️ Data synced to Server');
+                } catch (e) {
+                    console.warn('⚠️ Sync failed: ' + e.message);
+                }
             }
         }
-
-        const db = new Database();
-        let currentUser = null;
-        let chartInstances = {};
-
         // --- 2. SECURITY & HELPERS ---
         
         // Security: Sanitize inputs to prevent XSS
@@ -1172,3 +1244,4 @@
     </script>
 </body>
 </html>
+
